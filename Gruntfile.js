@@ -7,8 +7,8 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     bower: grunt.file.readJSON('bower.json'),
     ngDjangoFormset: {
-      src: ['djangoFormsets/**/module.js', 'djangoFormsets/**/*.js'],
-      bin: 'angularformsets/static/<%= bower.name %>',
+      src: ['ngDjangoFormset/**/module.js', 'ngDjangoFormset/**/*.js'],
+      bin: 'dist/<%= bower.name %>',
       license: grunt.file.read('LICENSE').split('\n').splice(3).join('\n'),
       banner: '/*!\n' +
         ' * <%= bower.title %> v<%= bower.version %>' +

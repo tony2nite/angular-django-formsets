@@ -16,8 +16,7 @@
     "url": "https://github.com/hilios/angular-django-formset/issues"
   },
   "main": [
-    "./angular-django-formset.js",
-    "./angular-django-formset.min.js"
+    "dist/angular-django-formset.js"
   ],
   "ignore": [
     "**/.*",
