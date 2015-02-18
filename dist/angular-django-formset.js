@@ -24,7 +24,7 @@ angular.module("ngDjangoFormset", []);
 
 angular.module("ngDjangoFormset").controller("ngDjangoFormsetCtrl", [ "$attrs", "$templateCache", "$compile", function($attrs, $templateCache, $compile) {
     var self = this;
-    self.__fid__ = 0;
+    self.__fid__ = -1;
     self.__children__ = [];
     self.__template__ = $templateCache.get($attrs.formset) || "";
     self.__formsetprefix__ = $attrs.formsetPrefix || "form";
@@ -100,10 +100,10 @@ angular.module("ngDjangoFormset").controller("ngDjangoFormsetCtrl", [ "$attrs", 
     };
     self.addFormset = function() {
         if (self.__children__.length < self.__maxforms__) {
+            self.__fid__ += 1;
             var element = angular.element(self.__template__.replace(/__prefix__/gi, self.__fid__));
             self.__container__.append(element);
             $compile(element)(self.__formset__.scope() || {});
-            self.__fid__ += 1;
             return element;
         }
     };
