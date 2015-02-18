@@ -8,7 +8,7 @@ angular.module('ngDjangoFormset')
     self.__children__ = [];
     self.__template__ = $templateCache.get($attrs.formset) || '';
     self.__formsetprefix__ = $attrs.formsetPrefix || 'form';
-    self.__candelete__ = $attrs.formsetCanDelete || false;
+    self.__candelete__ = $attrs.hasOwnProperty('formsetCanDelete') || false;
     self.__canorder__ = $attrs.formsetCanOrder || false;
 
     self.__formset__ = null;
