@@ -84,7 +84,6 @@ angular.module('ngDjangoFormset')
 
     self.addFormset = function() {
       if(self.__children__.length < self.__maxforms__) {
-        self.__fid__ += 1;
         // Setup a new element from template
         var element = angular.element(
           self.__template__.replace(/__prefix__/gi, self.__fid__)
@@ -93,6 +92,7 @@ angular.module('ngDjangoFormset')
         self.__container__.append(element);
         // Compile after append to inherits controller
         $compile(element)(self.__formset__.scope() || {});
+        self.__fid__ += 1;
         return element;
       }
     }

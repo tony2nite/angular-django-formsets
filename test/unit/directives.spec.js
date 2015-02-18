@@ -90,6 +90,12 @@ describe('ngDjangoFormset.directives', function() {
       addButton.click();
       expect(container.find('li')).to.have.data('fid').to.match(/^[0-9]+$/);
     });
+
+    it('should have formeset id with zero index', function() {
+      var child;
+      addButton.click();
+      expect(container.find('li')).to.have.data('fid').to.match(/0/);
+    });
   });
 
   describe('formset-remove', function() {
