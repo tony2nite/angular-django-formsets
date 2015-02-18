@@ -98,18 +98,18 @@ angular.module('ngDjangoFormset')
     }
 
     self.removeFormset = function(element) {
-      if(self.__children__.length > self.__minforms__) {
-        var child = element,
-          isChild = function(child) {
-            return child.attr('formset-child') !== undefined ||
-              child.attr('data-formset-child') !== undefined ||
-              child.attr('x-formset-child') !== undefined;
-          };
-        // Find the child container
-        while(!isChild(child) && child.prop('tagName') !== 'BODY') {
-          child = child.parent();
-        }
-        if(child.prop('tagName') !== 'BODY') {
+      var child = element,
+        isChild = function(child) {
+          return child.attr('formset-child') !== undefined ||
+            child.attr('data-formset-child') !== undefined ||
+            child.attr('x-formset-child') !== undefined;
+        };
+      // Find the child container
+      while(!isChild(child) && child.prop('tagName') !== 'BODY') {
+        child = child.parent();
+      }
+      if(child.prop('tagName') !== 'BODY') {
+        if(self.__children__.length > self.__minforms__) {
           try {
             child.scope().$destroy();
           } catch(error) {
@@ -117,9 +117,17 @@ angular.module('ngDjangoFormset')
           } finally {
             child.remove();
           }
+        } else if (self.__candelete__ === true && self.__children__.length > 0) {
+          var checkbox = child.find('#id_' + self.__formsetprefix__ + '-' + self.__fid__ + '-DELETE');
+          if (checkbox.length > 0) {
+            checkbox.prop( "checked", true );
+          }
+          child.addClass('deleted');      // Up to user to determine how the visuals change on deletion
         }
-        return child;
+      } else {
+        child = null;
       }
+      return child;
     }
 
     self.registerChild = function(element) {

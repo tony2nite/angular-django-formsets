@@ -52,7 +52,7 @@ angular.module('ngDjangoFormset')
     require: '^formset',
     restrict: 'A',
     link: function postLink(scope, element, attrs, controller) {
-      element.one('click', function(event) {
+      element.on('click', function(event) {
         event.preventDefault();
         controller.removeFormset(element);
       });

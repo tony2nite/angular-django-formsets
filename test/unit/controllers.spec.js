@@ -181,8 +181,9 @@ describe('ngDjangoFormsetCtrl', function(){
     var child, removeButton;
 
     beforeEach(inject(function($compile) {
-      child = angular.element('<li>' +
+      child = angular.element('<li data-fid="0">' +
         '<button>Remove</button>' +
+        '<input id="id_foo-0-DELETE" name="foo-0-DELETE" type="checkbox">' +
         '</li>');
       removeButton = child.find('button');
       // Append to container
@@ -228,7 +229,22 @@ describe('ngDjangoFormsetCtrl', function(){
       expect(container.html()).to.not.be.equal('');
     });
 
-    it('should hide formeset children and set delete input if __candelete__');
+    it('should hide formeset children and set delete input if __candelete__', function() {
+      child.attr('formset-child', '');
+      controller.__minforms__ = 1;
+      controller.removeFormset(removeButton);
+      expect(child.find('input[type=checkbox]').prop('checked')).to.be.true;
+      expect(child.hasClass('deleted')).to.be.true;
+    });
+
+    it('should not hide formeset children and set delete input if __candelete__ === false', function() {
+      child.attr('formset-child', '');
+      controller.__minforms__ = 1;
+      controller.__candelete__ = false;
+      controller.removeFormset(removeButton);
+      expect(child.find('input[type=checkbox]').prop('checked')).to.be.false;
+      expect(child.hasClass('deleted')).to.be.false;
+    });
   });
 
   describe('#registerChild(element)', function() {
