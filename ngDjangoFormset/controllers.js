@@ -84,6 +84,18 @@ angular.module('ngDjangoFormset')
       }
     }
 
+    self.indexOfChild = function(child) {
+        var index = -1;
+        for (var i = 0; i < self.__children__.length; i++) {
+            var c = self.__children__[i];
+            if (c[0] == child[0]) {
+                index = i;
+                break;
+            }
+        };
+        return index;
+    }
+
     self.addFormset = function() {
       if(self.__children__.length < self.__maxforms__) {
         // Setup a new element from template
@@ -120,11 +132,14 @@ angular.module('ngDjangoFormset')
             child.remove();
           }
         } else if (self.__candelete__ === true && self.__children__.length > 0) {
-          var checkbox = child.find('#id_' + self.__formsetprefix__ + '-' + self.__fid__ + '-DELETE');
+          var name = "#id_" + self.__formsetprefix__ + "-" + self.indexOfChild(child) + "-DELETE";
+          var checkbox = child.find(name);
           if (checkbox.length > 0) {
-            checkbox.prop( "checked", true );
+              checkbox.prop("checked", true);
+          } else {
+              console.log("Couldn't find checkbox:" + name);
           }
-          child.addClass('deleted');      // Up to user to determine how the visuals change on deletion
+          child.addClass("deleted");
         }
       } else {
         child = null;
