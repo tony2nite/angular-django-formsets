@@ -245,6 +245,23 @@ describe('ngDjangoFormsetCtrl', function(){
       expect(child.find('input[type=checkbox]').prop('checked')).to.be.false;
       expect(child.hasClass('deleted')).to.be.false;
     });
+
+    it('should hide formset if delete already checked', function() {
+      child.attr('formset-child', '');
+
+      var checked = angular.element('<li data-fid="1">' +
+        '<button>Remove</button>' +
+        '<input id="id_foo-1-DELETE" name="foo-1-DELETE" type="checkbox" checked>' +
+        '</li>');
+      container.append(checked);
+
+      controller.registerChild(checked);
+
+      controller.__minforms__ = 2;
+      controller.__candelete__ = true;
+
+      expect(checked.hasClass('deleted')).to.be.true;
+    });
   });
 
   describe('#registerChild(element)', function() {

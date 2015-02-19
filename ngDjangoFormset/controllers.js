@@ -132,14 +132,7 @@ angular.module('ngDjangoFormset')
             child.remove();
           }
         } else if (self.__candelete__ === true && self.__children__.length > 0) {
-          var name = "#id_" + self.__formsetprefix__ + "-" + self.indexOfChild(child) + "-DELETE";
-          var checkbox = child.find(name);
-          if (checkbox.length > 0) {
-              checkbox.prop("checked", true);
-          } else {
-              console.log("Couldn't find checkbox:" + name);
-          }
-          child.addClass("deleted");
+          self.markDeleted(child);
         }
       } else {
         child = null;
@@ -150,12 +143,41 @@ angular.module('ngDjangoFormset')
     self.registerChild = function(element) {
       self.__children__.push(element);
       self.update();
+
+      var checkbox = self.getDeleteCheckboxForChild(element);
+      if (checkbox && checkbox.prop("checked") && self.__candelete__ === true) {
+        self.markDeleted(element);
+      }
     }
 
     self.destroyChild = function(element) {
       var childIndex = self.__children__.indexOf(element);
       self.__children__.splice(childIndex, 1);
       self.update();
+    }
+
+    self.getDeleteCheckboxForChild = function(child) {
+      var checkbox;
+      var index = self.indexOfChild(child);
+
+      if (index >= 0 && child.find) {
+        var name = "#id_" + self.__formsetprefix__ + "-" + index + "-DELETE";
+        checkbox = child.find(name);
+        if (checkbox.length == 0) {
+          checkbox = false;
+        }
+      }
+      return checkbox;
+    }
+
+    self.markDeleted = function(child) {
+        var checkbox = self.getDeleteCheckboxForChild(child);
+        if (checkbox) {
+            checkbox.prop("checked", true);
+        } else {
+            console.log("Couldn't find checkbox:" + name);
+        }
+        child.addClass("deleted");
     }
   }
 ]);
