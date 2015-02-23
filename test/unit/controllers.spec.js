@@ -16,7 +16,7 @@ describe('ngDjangoFormsetCtrl', function(){
       input.val(value || '');
       return input;
     },
-    TEMPLATE = '<li data-fid="__prefix__">Foo Bar</li>';
+    TEMPLATE = '<li data-fid="__prefix__">Foo Bar<button>Remove</button></li>';
 
   beforeEach(module('ngDjangoFormset'));
 
@@ -177,7 +177,32 @@ describe('ngDjangoFormsetCtrl', function(){
     });
   });
 
-  describe('#removeFormset(element)', function() {
+  describe('#removeFormset(element) with empty container', function() {
+    var child, removeButton;
+
+    beforeEach(inject(function($compile) {
+      // Setup the controller
+      controller.setup(formset);
+    }));
+
+    it('should not have child in the container', function() {
+      expect(container.html()).to.be.not.ok;
+    });
+
+
+    it('should remove formset child', function() {
+      child = controller.addFormset();
+      child.attr('data-formset-child', '');
+      removeButton = child.find('button');
+
+      controller.removeFormset(removeButton);
+
+      expect(container.html()).to.be.equal('');
+    });
+  });
+
+
+  describe('#removeFormset(element) with existing container', function() {
     var child, removeButton;
 
     beforeEach(inject(function($compile) {
@@ -195,12 +220,6 @@ describe('ngDjangoFormsetCtrl', function(){
 
     it('should have child in the container', function() {
       expect(container.html()).to.be.ok;
-    });
-
-    it('should remove formset child', function() {
-      child.attr('formset-child', '');
-      controller.removeFormset(removeButton);
-      expect(container.html()).to.be.equal('');
     });
 
     it('should find the children container with prefix data-*', function() {
@@ -257,12 +276,36 @@ describe('ngDjangoFormsetCtrl', function(){
 
       controller.registerChild(checked);
 
-      controller.__minforms__ = 2;
       controller.__candelete__ = true;
 
       expect(checked.hasClass('deleted')).to.be.true;
     });
+
+    it('should delete the correct formset', function() {
+      child.attr('formset-child', '');
+
+      controller.__minforms__ = 1;
+      controller.__candelete__ = true;
+
+      var checked = angular.element('<li data-fid="1">' +
+        '<button>Remove</button>' +
+        '<input id="id_foo-1-DELETE" name="foo-1-DELETE" type="checkbox">' +
+        '</li>');
+      container.append(checked);
+      controller.registerChild(checked);
+      expect(controller.__children__).to.include.members([child]);
+      expect(controller.__children__).to.include.members([checked]);
+
+      // remove the first formset
+      controller.removeFormset(removeButton);
+
+      expect(controller.__children__).to.include.members([child]);
+      expect(controller.__children__).to.include.members([checked]);    // the element will be on the page but marked in Django for deletion
+      // expect(child.hasClass('deleted')).to.be.true;
+      // expect(child.find('input[type=checkbox]').prop('checked')).to.be.true;
+    });
   });
+
 
   describe('#registerChild(element)', function() {
     it('should add a children and update', function() {
