@@ -35,20 +35,28 @@ angular.module("ngDjangoFormset").controller("ngDjangoFormsetCtrl", [ "$attrs", 
     self.__totalforms__ = null;
     self.__minforms__ = 0;
     self.__maxforms__ = 1e3;
+    self.getFidForElement = function(element) {
+        var fidRegexp = new RegExp(self.__formsetprefix__ + "\\-([0-9]{1,})", "i");
+        var fid = -1;
+        var inputName = element.find("input").prop("name");
+        if (inputName) {
+            inputName = inputName.match(fidRegexp);
+            if (inputName) {
+                fid = parseInt(inputName[1]);
+            }
+        }
+        return fid;
+    };
     self.setup = function(element) {
         self.__formset__ = element;
         if (self.__template__) {
             self.__template__ = self.__template__.replace(/^(\s|\n|\t){1,}/gi, "");
         }
-        var fidRegexp = new RegExp(self.__formsetprefix__ + "\\-([0-9]{1,})", "i"), managementFormRegexp = new RegExp(self.__formsetprefix__ + "\\-([A-Z_]+)");
+        var managementFormRegexp = new RegExp(self.__formsetprefix__ + "\\-([A-Z_]+)");
         angular.forEach(self.__children__, function(value, index) {
-            var fid, inputName = value.find("input").prop("name");
-            inputName = inputName.match(fidRegexp);
-            if (inputName) {
-                fid = parseInt(inputName[1]);
-                if (fid > self.__fid__) {
-                    self.__fid__ = fid;
-                }
+            var fid = self.getFidForElement(value);
+            if (fid > -1 && fid > self.__fid__) {
+                self.__fid__ = fid;
             }
         });
         angular.forEach(element.find("input"), function(value, index) {
@@ -102,6 +110,7 @@ angular.module("ngDjangoFormset").controller("ngDjangoFormsetCtrl", [ "$attrs", 
         if (self.__children__.length < self.__maxforms__) {
             self.__fid__ += 1;
             var element = angular.element(self.__template__.replace(/__prefix__/gi, self.__fid__));
+            element.__fid__ = self.__fid__;
             self.__container__.append(element);
             $compile(element)(self.__formset__.scope() || {});
             return element;
@@ -115,7 +124,11 @@ angular.module("ngDjangoFormset").controller("ngDjangoFormsetCtrl", [ "$attrs", 
             child = child.parent();
         }
         if (child.prop("tagName") !== "BODY") {
-            if (self.__children__.length > self.__minforms__) {
+            var indexToRemove = self.getFidForElement(child);
+            if (indexToRemove == -1) {
+                indexToRemove = self.__children__.length;
+            }
+            if (indexToRemove >= self.__minforms__) {
                 try {
                     child.scope().$destroy();
                 } catch (error) {} finally {
